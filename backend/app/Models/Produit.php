@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Produit extends Model
 {
      use HasFactory;
-    protected $fillable=["nom_produit","description_prduit","prix","stock_produit"];
+    protected $fillable=["nom_prduit","description_prduit","prix","stock_produit","image","categorie_id"];
 
     public function categorie() {
     return $this->belongsTo(Categorie::class);

@@ -80,3 +80,104 @@ export const adminCreateProduit=async(produitData)=>{
     return response;
     
 }
+
+// ─── Admin Produits ───────────────────────────────────────────────────────────
+export const adminGetProduits = async () => {
+  const response = await axios.get(`${API_URL}/admin/produits`, { headers: headers() });
+  return response;
+};
+
+export const adminUpdateProduit = async (id, data) => {
+  const response = await axios.put(`${API_URL}/admin/produits/${id}`, data, { headers: headers() });
+  return response;
+};
+
+export const adminDeleteProduit = async (id) => {
+  const response = await axios.delete(`${API_URL}/admin/produits/${id}`, { headers: headers() });
+  return response;
+};
+
+// ─── Admin Catégories ─────────────────────────────────────────────────────────
+export const adminGetCategories = async () => {
+  const response = await axios.get(`${API_URL}/admin/categories`, { headers: headers() });
+  return response;
+};
+
+export const adminCreateCategorie = async (data) => {
+  const response = await axios.post(`${API_URL}/admin/categories`, data, { headers: headers() });
+  return response;
+};
+
+export const adminUpdateCategorie = async (id, data) => {
+  const response = await axios.put(`${API_URL}/admin/categories/${id}`, data, { headers: headers() });
+  return response;
+};
+
+export const adminDeleteCategorie = async (id) => {
+  const response = await axios.delete(`${API_URL}/admin/categories/${id}`, { headers: headers() });
+  return response;
+};
+
+// ─── Admin Clients ────────────────────────────────────────────────────────────
+export const adminGetClients = async () => {
+  const response = await axios.get(`${API_URL}/admin/clients`, { headers: headers() });
+  return response;
+};
+
+export const adminDeleteClient = async (id) => {
+  const response = await axios.delete(`${API_URL}/admin/clients/${id}`, { headers: headers() });
+  return response;
+};
+
+// ─── Admin Commandes ──────────────────────────────────────────────────────────
+export const adminGetCommandes = async () => {
+  const response = await axios.get(`${API_URL}/admin/commandes`, { headers: headers() });
+  return response;
+};
+
+export const adminUpdateStatutCommande = async (id, statut) => {
+  const response = await axios.put(`${API_URL}/admin/commandes/${id}`, { statut }, { headers: headers() });
+  return response;
+};
+
+// ─── Admin Stats ──────────────────────────────────────────────────────────────
+export const adminGetStats = async () => {
+  const response = await axios.get(`${API_URL}/admin/stats`, { headers: headers() });
+  return response;
+};
+
+// ─── Wishlist ─────────────────────────────────────────────────────────────────
+export const getWishlist = async () => {
+  const response = await axios.get(`${API_URL}/wishlist`, { headers: headers() });
+  return response;
+};
+
+export const ajouterWishlist = async (produitId) => {
+  const response = await axios.post(`${API_URL}/wishlist`, { produit_id: produitId }, { headers: headers() });
+  return response;
+};
+
+export const supprimerWishlist = async (id) => {
+  const response = await axios.delete(`${API_URL}/wishlist/${id}`, { headers: headers() });
+  return response;
+};
+
+// ─── Commandes client ─────────────────────────────────────────────────────────
+export const getCommandeById = async (id) => {
+  const response = await axios.get(`${API_URL}/commandes/${id}`, { headers: headers() });
+  return response;
+};
+
+export const supprimerLigne = async (commandeId, ligneId) => {
+  const response = await axios.delete(`${API_URL}/commandes/${commandeId}/lignes/${ligneId}`, { headers: headers() });
+  return response;
+};
+
+export const modifierLigne = async (commandeId, ligneId, quantite) => {
+  const response = await axios.put(
+    `${API_URL}/commandes/${commandeId}/lignes/${ligneId}`,
+    { quantite },
+    { headers: headers() }
+  );
+  return response;
+};

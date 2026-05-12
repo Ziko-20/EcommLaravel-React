@@ -1,32 +1,30 @@
 {
-    "email":"Email",
-    "name":"First name & Last name",
-    "phone":"Phone",
-    "adress":"Adress",
+    "email":    "Email",
+    "name":     "First name & Last name",
+    "phone":    "Phone",
+    "adress":   "Address",
 
-    "login":"Login",
-    "password":"Password",
-    "Register":"Register",
-    "return":"Return",
-    "createacc":"Don't have an account? Create one",
+    "login":      "Login",
+    "password":   "Password",
+    "Register":   "Register",
+    "return":     "Return",
+    "createacc":  "Don't have an account? Create one",
 
-    "addToCart":"Add to cart",
-    "filtrer":"Filter",
-    
-    "products":"Products" ,
-    "cart":"Cart",
-    "profil":"Profil",
-    "contactersupp":"Contact Support",
-    "category":"Category",
+    "addToCart":  "Add to cart",
+    "filtrer":    "Filter",
 
-    "Nomproduit":"Product Name",
-"categoryproduit":"Category",
-"descriptionproduit":"Description",
-"ratingproduit":"Rating",
-"prixproduit":"Price",
-"quantiteproduit":"Quantity in stock"
+    "products":      "Products",
+    "cart":          "Cart",
+    "profil":        "Profile",
+    "contactersupp": "Contact Support",
+    "category":      "Category",
+    "wishlist":      "Wishlist",
+    "orders":        "Orders",
 
-
-    
-
+    "Nomproduit":       "Product Name",
+    "categoryproduit":  "Category",
+    "descriptionproduit": "Description",
+    "ratingproduit":    "Rating",
+    "prixproduit":      "Price",
+    "quantiteproduit":  "Quantity in stock"
 }

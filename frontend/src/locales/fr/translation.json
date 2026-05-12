@@ -1,37 +1,30 @@
 {
-    
-    "email":"Email",
-    "name":"Nom & Prenom",
-    "phone":"Telephone",
-    "adress":"Adresse",
-    
-    "password":"Mot de passe",
-    "login":"Se connecter",
-    "Register":"S'authentifier",
-    "return":"Retouner",
-    "createacc":"Vous n'avez pas de compte ? Créez-en un",
+    "email":    "Email",
+    "name":     "Nom & Prénom",
+    "phone":    "Téléphone",
+    "adress":   "Adresse",
 
-    "addToCart":"Ajouter au panier",
-    "filtrer":"Filtrer"
-    ,
-    
-    
-    "products":"Produits",
-    "cart":"Panier",
-    "profil":"Profile",
-    "contactersupp":"Contacter Support",
-    "category":"Categorie",
+    "password":  "Mot de passe",
+    "login":     "Se connecter",
+    "Register":  "S'inscrire",
+    "return":    "Retourner",
+    "createacc": "Vous n'avez pas de compte ? Créez-en un",
 
-    "Nomproduit":"Nom du Produit",
-"categoryproduit":"Catégorie",
-"descriptionproduit":"Description",
-"ratingproduit":"Note",
-"prixproduit":"Prix",
-"quantiteproduit":"Quantité en stock"
+    "addToCart": "Ajouter au panier",
+    "filtrer":   "Filtrer",
 
+    "products":      "Produits",
+    "cart":          "Panier",
+    "profil":        "Profil",
+    "contactersupp": "Contacter le support",
+    "category":      "Catégorie",
+    "wishlist":      "Wishlist",
+    "orders":        "Commandes",
 
-
-
-
-
+    "Nomproduit":         "Nom du Produit",
+    "categoryproduit":    "Catégorie",
+    "descriptionproduit": "Description",
+    "ratingproduit":      "Note",
+    "prixproduit":        "Prix",
+    "quantiteproduit":    "Quantité en stock"
 }

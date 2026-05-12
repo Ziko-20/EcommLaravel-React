@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\AdminControllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Produit;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,7 @@ class AdminProduitController extends Controller
             'prix'               => 'required|numeric|min:0',
             'stock_produit'      => 'required|integer|min:0',
             'categorie_id'       => 'required|exists:categories,id',
+            'image'              => 'nullable|string',
         ]);
 
         $produit = Produit::create($request->all());

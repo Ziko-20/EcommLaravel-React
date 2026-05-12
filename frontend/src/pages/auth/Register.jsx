@@ -1,30 +1,52 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import{User,Mail,MapPinHouse,Phone,Lock} from 'lucide-react';
-import logoSmall from '../../assets/logoSmall.png'
+import { User, Mail, MapPinHouse, Phone, Lock } from 'lucide-react';
 import { register } from '../../services/authService';
+import { useAuth } from '../../context/AuthContext';
 import logoCadree from '../../assets/logoCadree.png';
-import LogoAnimation from '../../assets/LogoVid.mp4'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 /* import LogoAnimation from '../assets/LogoVid.mp4'
  */const Register = () => {
 
-const{t}=useTranslation();
+const { t } = useTranslation();
+const navigate = useNavigate();
+const { login } = useAuth();
 
-  const [email,setEmail]=useState('');
-  const [telephone,setTelephone]=useState('');
-  const [nom,setNom]=useState('');
-  const [adresse,setAdresse]=useState('');
-  const [password,setPassword]=useState('');
-
+  const [email, setEmail]       = useState('');
+  const [telephone, setTelephone] = useState('');
+  const [nom, setNom]           = useState('');
+  const [adresse, setAdresse]   = useState('');
+  const [password, setPassword] = useState('');
   const [indicatif, setIndicatif] = useState('+212');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
 
-  
-  const handleSubmit=async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const response=await register({email,password,adresse,nom,telephone:indicatif+telephone});
-    console.log(response.data);
-
+    setError('');
+    setLoading(true);
+    try {
+      const response = await register({
+        email,
+        password,
+        password_confirmation: password,
+        adresse,
+        name: nom,
+        telephone: indicatif + telephone,
+      });
+      const { user, token } = response.data;
+      login(user, token);
+      navigate('/produits');
+    } catch (err) {
+      const errors = err.response?.data?.errors;
+      if (errors) {
+        setError(Object.values(errors).flat().join(' '));
+      } else {
+        setError(err.response?.data?.message || 'Erreur lors de l\'inscription');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* Indicatifs Telephone */
@@ -40,6 +62,12 @@ const{t}=useTranslation();
       <div className='flex justify-center items-center'>
         <img src={logoCadree} alt="logoEcomm" className='w-44' />
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-2">
+          {error}
+        </div>
+      )}
 
       {/* NOM */}
       <div className='flex flex-col gap-2'>
@@ -144,10 +172,11 @@ const{t}=useTranslation();
       <div className='flex flex-col gap-3'>
         <button
           type="submit"
-          className='bg-green-600 text-white font-bold w-full rounded-xl py-2 hover:bg-green-500 transition-colors duration-200'
+          disabled={loading}
+          className='bg-green-600 text-white font-bold w-full rounded-xl py-2 hover:bg-green-500 transition-colors duration-200 disabled:opacity-60'
           onClick={handleSubmit}
         >
-          {t('Register')}
+          {loading ? 'Inscription...' : t('Register')}
         </button>
 
         <p className='text-sm text-gray-400 text-center'>

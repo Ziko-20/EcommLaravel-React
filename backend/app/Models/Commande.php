@@ -12,7 +12,7 @@ class Commande extends Model
 
 use HasFactory;
 
-    protected $fillable=["date_commande","total","statut"];
+    protected $fillable=["user_id","date_commande","total","statut"];
 
     public function user() {
     return $this->belongsTo(User::class);

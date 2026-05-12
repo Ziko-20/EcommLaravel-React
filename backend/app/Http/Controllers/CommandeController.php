@@ -7,73 +7,64 @@ use App\Models\Commande;
 
 class CommandeController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
+        if (!$request->user()) {
+            return response()->json([
+                'succes'  => false,
+                'message' => 'Vous devez être connecté',
+            ], 401);
+        }
 
-        if(!$request->user()){
-            return response()->json(
-            [
-                "succes"=>false,
-                "message"=>"vous devais etres connecter"
-            ],401);
+        $commandes = Commande::with(['ligne_commande.produit'])
+            ->where('user_id', $request->user()->id)
+            ->get();
 
-        
-       }$commande=Commande::where('user_id','=',$request->user()->id)->get();
-       return response()->json([
-        "succes"=>true,
-        "data"=>$commande
-       ],200);
+        return response()->json([
+            'succes' => true,
+            'data'   => $commandes,
+        ], 200);
     }
 
-    public function store(Request $request){
-
+    public function store(Request $request)
+    {
         $request->validate([
-        
-        "date_commande" => "required|date",
-        "total" => "required|numeric",
-        "statut" => "required|in:en_attente,expediee,livree"]);
-        
+            'date_commande' => 'required|date',
+            'total'         => 'required|numeric',
+            'statut'        => 'required|in:en_attente,expediee,livree',
+        ]);
 
-        $commande=Commande::create([
-            "user_id" => $request->user()->id,
-            "date_commande" => now(),
-            "total" => $request->total,
-            "statut" => $request->statut
+        $commande = Commande::create([
+            'user_id'        => $request->user()->id,
+            'date_commande'  => now(),
+            'total'          => $request->total,
+            'statut'         => $request->statut,
         ]);
 
         return response()->json([
-            "succes"=>true,
-            "message"=>"Commande ajouter avec succes",
-            "data" => $commande
-        ],201);
+            'succes'  => true,
+            'message' => 'Commande ajoutée avec succès',
+            'data'    => $commande,
+        ], 201);
     }
 
+    public function show(Request $request, $id)
+    {
+        $commande = Commande::with(['ligne_commande.produit'])
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
 
-    /**/ 
-    public function show(Request $request , $id){
-
-       $commande= Commande::where('id', $id)->where('user_id',auth()->id())->first();
-      
-if(!$commande){
-    return response()->json([
-            "success"=>false,
-            "message"=>"Commande est introuvable",
-        ],404);
-}
-        return response()->json([
-            "success"=>true,
-            "message"=>"Commande s affiche avec succes",
-            "data" => $commande
-        ],200);
-    }
-}
-
-
-
-
-
-/*  $commande=Commande::all();
+        if (!$commande) {
             return response()->json([
-                "succes"=>true,
-                "data"=>$commande
-            ]);
-        */
+                'success' => false,
+                'message' => 'Commande introuvable',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $commande,
+        ], 200);
+    }
+}
