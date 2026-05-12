@@ -19,9 +19,17 @@ export const CartProvider = ({ children }) => {
     }).catch(() => {});
   }, []);
 
-  // Obtenir ou créer un panier
   const getPanierID = async () => {
-    if (commandeId) return commandeId;
+    // Si on a un ID en mémoire, vérifier qu'il est toujours en_attente
+    if (commandeId) {
+      try {
+        const res = await getCommandes();
+        const enAttente = res.data.data.find(c => c.statut === 'en_attente');
+        if (enAttente && enAttente.id === commandeId) return commandeId;
+        // L'ancienne commande n'est plus en_attente, on en crée une nouvelle
+        setCommandeId(null);
+      } catch (_) {}
+    }
 
     const res = await creerCommande();
     const id = res.data.data.id;

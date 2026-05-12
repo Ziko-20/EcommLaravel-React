@@ -5,7 +5,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
-import { getCommandes, supprimerLigne, modifierLigne } from '../../services/productService';
+import { getCommandes, supprimerLigne, modifierLigne, validerCommande } from '../../services/productService';
 
 const Panier = () => {
   const navigate        = useNavigate();
@@ -55,6 +55,7 @@ const Panier = () => {
     <div className="min-h-screen bg-[#f8f9ff] flex flex-col">
       <Navbar />
       <div className="flex-1 flex justify-center items-center text-gray-400">Chargement...</div>
+      <Footer />
     </div>
   );
 
@@ -125,7 +126,19 @@ const Panier = () => {
                 <span>{commande?.total} DH</span>
               </div>
               <button
-                onClick={() => navigate('/paiement', { state: { total: commande?.total, lignes } })}
+                onClick={async () => {
+                  if (lignes.length === 0) {
+                    toast('Ajoutez au moins un produit avant de passer au paiement', 'error');
+                    return;
+                  }
+                  try {
+                    await validerCommande(commande.id);
+                    setCommandeId(null); // réinitialiser le panier dans le contexte
+                    navigate('/paiement', { state: { total: commande?.total, lignes } });
+                  } catch (err) {
+                    toast(err.response?.data?.message || 'Erreur lors de la validation', 'error');
+                  }
+                }}
                 className="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl py-3 flex items-center justify-center gap-2 transition-colors"
               >
                 Passer au paiement <ArrowRight size={16} />

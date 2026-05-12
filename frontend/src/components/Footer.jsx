@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="max-w-screen-xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-3 gap-8">
         {/* Brand */}
         <div>
-          <h3 className="font-bold text-gray-800 mb-3">Mon E-Commerce</h3>
+          <h3 className="font-bold text-gray-800 mb-3">SmartShop</h3>
           <p className="text-sm text-gray-400 leading-relaxed">
             Votre boutique en ligne pour trouver les meilleurs produits au meilleur prix.
           </p>
@@ -36,14 +36,14 @@ const Footer = () => {
               <Phone size={14} /> +212 6 00 00 00 00
             </li>
             <li className="flex items-center gap-2 text-sm text-gray-400">
-              <MapPin size={14} /> Casablanca, Maroc
+              <MapPin size={14} /> Rabat, Maroc
             </li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-gray-100 py-4 text-center text-xs text-gray-400">
-        © {new Date().getFullYear()} Mon E-Commerce. Tous droits réservés.
+        © {new Date().getFullYear()} SmartShop. Tous droits réservés.
       </div>
     </footer>
   );

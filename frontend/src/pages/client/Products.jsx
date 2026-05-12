@@ -20,6 +20,7 @@ const Products = () => {
   const [search, setSearch]           = useState('');
   const [categorieId, setCategorieId] = useState('');
   const [prixMax, setPrixMax]         = useState('');
+  const [disponibilite, setDisponibilite] = useState('');
   const [page, setPage]               = useState(1);
   const [lastPage, setLastPage]       = useState(1);
   const [filterOpen, setFilterOpen]   = useState(false);
@@ -30,12 +31,12 @@ const Products = () => {
 
   useEffect(() => {
     setLoading(true);
-    getProduitsFilter(search, prixMax, categorieId, page).then((r) => {
+    getProduitsFilter(search, prixMax, categorieId, page, disponibilite).then((r) => {
       setProduits(r.data.data.data);
       setLastPage(r.data.data.last_page);
       setLoading(false);
     });
-  }, [search, prixMax, categorieId, page]);
+  }, [search, prixMax, categorieId, page, disponibilite]);
 
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [page]);
 
@@ -51,8 +52,8 @@ const Products = () => {
     }
   };
 
-  const hasFilters = categorieId || prixMax;
-  const clearFilters = () => { setCategorieId(''); setPrixMax(''); setPage(1); };
+  const hasFilters = categorieId || prixMax || disponibilite;
+  const clearFilters = () => { setCategorieId(''); setPrixMax(''); setDisponibilite(''); setPage(1); };
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] flex flex-col">
@@ -90,7 +91,7 @@ const Products = () => {
               Filtres
               {hasFilters && (
                 <span className="w-5 h-5 rounded-full bg-white text-green-600 text-xs font-bold flex items-center justify-center">
-                  {[categorieId, prixMax].filter(Boolean).length}
+                  {[categorieId, prixMax, disponibilite].filter(Boolean).length}
                 </span>
               )}
             </button>
@@ -120,6 +121,19 @@ const Products = () => {
                   className="border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-green-400"
                 />
               </div>
+
+              {/* Disponibilité */}
+              <div className="flex flex-col gap-1.5 min-w-[160px]">
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Disponibilité</label>
+                <select
+                  value={disponibilite}
+                  onChange={(e) => { setDisponibilite(e.target.value); setPage(1); }}
+                  className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white outline-none focus:border-green-400 cursor-pointer"
+                >
+                  <option value="">Tous les produits</option>
+                  <option value="en_stock">En stock uniquement</option>
+                </select>
+              </div>
               {hasFilters && (
                 <button onClick={clearFilters} className="flex items-center gap-1.5 text-sm text-red-400 hover:text-red-600 px-3 py-2 rounded-xl hover:bg-red-50 transition-colors">
                   <X size={14} /> Réinitialiser
@@ -140,6 +154,12 @@ const Products = () => {
                 <span className="flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
                   Max {prixMax} DH
                   <button onClick={() => { setPrixMax(''); setPage(1); }}><X size={11} /></button>
+                </span>
+              )}
+              {disponibilite && (
+                <span className="flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
+                  En stock uniquement
+                  <button onClick={() => { setDisponibilite(''); setPage(1); }}><X size={11} /></button>
                 </span>
               )}
             </div>

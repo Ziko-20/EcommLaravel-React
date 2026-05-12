@@ -18,6 +18,7 @@ Application e-commerce complète construite avec **React + Vite** (frontend) et 
 - [Structure des dossiers](#structure-des-dossiers)
 - [Routes API](#routes-api)
 - [Base de données](#base-de-données)
+- [Triggers MySQL](#triggers-mysql)
 - [Composants & Contextes](#composants--contextes)
 
 ---
@@ -52,7 +53,7 @@ Application e-commerce complète construite avec **React + Vite** (frontend) et 
 | PHP | 8.2+ | Langage serveur |
 | Laravel | 13 | Framework API REST |
 | Laravel Sanctum | 4 | Authentification par token |
-| MySQL / SQLite | — | Base de données |
+| MySQL | 8.0 | Base de données (triggers natifs) |
 | Eloquent ORM | — | Modèles et relations |
 
 ---
@@ -79,7 +80,9 @@ Séparation stricte frontend / backend. Le frontend consomme l'API via Axios ave
 | Composer | 2.x |
 | Node.js | 18 |
 | npm | 9 |
-| MySQL | 8.0 (ou SQLite pour dev rapide) |
+| MySQL | 8.0 (requis pour les triggers) |
+
+> **Note :** SQLite ne supporte pas les triggers MySQL. Utiliser MySQL pour bénéficier de la gestion automatique du stock en base de données.
 
 ---
 
@@ -88,8 +91,8 @@ Séparation stricte frontend / backend. Le frontend consomme l'API via Axios ave
 ### 1. Cloner le projet
 
 ```bash
-git clone <url-du-repo>
-cd My_E-commerce
+git clone https://github.com/Ziko-20/EcommLaravel-React.git
+cd EcommLaravel-React
 ```
 
 ### 2. Backend
@@ -118,7 +121,7 @@ npm install
 
 ## Configuration
 
-### Base de données MySQL (recommandé)
+### Base de données MySQL
 
 Éditer `backend/.env` :
 
@@ -131,25 +134,9 @@ DB_USERNAME=root
 DB_PASSWORD=votre_mot_de_passe
 ```
 
-### Base de données SQLite (développement rapide)
-
-```env
-DB_CONNECTION=sqlite
-```
-
-Puis créer le fichier :
-
-```bash
-# Windows
-New-Item -ItemType File -Path "database\database.sqlite" -Force
-
-# Linux / Mac
-touch database/database.sqlite
-```
-
 ### CORS
 
-Le frontend tourne sur `http://localhost:5173` (ou `5174`). Laravel autorise les origines locales par défaut via `fruitcake/laravel-cors`.
+Le frontend tourne sur `http://localhost:5173` (ou `5174`). Laravel autorise les origines locales par défaut.
 
 ---
 
@@ -160,10 +147,10 @@ Le frontend tourne sur `http://localhost:5173` (ou `5174`). Laravel autorise les
 ```bash
 cd backend
 
-# Créer les tables
+# Créer les tables + triggers MySQL
 php artisan migrate
 
-# Peupler avec des données de test (optionnel mais recommandé)
+# Peupler avec des données de test
 php artisan db:seed
 ```
 
@@ -229,9 +216,12 @@ Ou créer un compte directement via `/register`.
 #### Catalogue produits (`/produits`)
 - Grille responsive (1 à 4 colonnes selon la taille d'écran)
 - **Recherche** en temps réel par nom de produit
-- **Filtres** dépliables : catégorie + prix maximum
-- Tags de filtres actifs avec suppression individuelle
-- Badge de stock coloré (vert / orange / rouge)
+- **Filtres** dépliables :
+  - Catégorie
+  - Prix maximum
+  - **Disponibilité** : tous les produits / en stock uniquement (`stock_produit > 0`)
+- Tags de filtres actifs avec suppression individuelle et compteur
+- Badge de stock coloré (vert > 50 / orange > 10 / rouge ≤ 10)
 - Pagination avec numéros de pages
 - Ajout au panier depuis la liste
 
@@ -246,14 +236,15 @@ Ou créer un compte directement via `/register`.
 - Modification de quantité en ligne (`+` / `−`)
 - Suppression d'un article
 - Résumé avec sous-total, livraison gratuite, total
-- Bouton "Passer au paiement" → redirection vers la page de paiement
+- **Validation métier** : impossible de passer au paiement si le panier est vide — vérification côté frontend ET via `POST /commandes/{id}/valider` côté API
+- Bouton "Passer au paiement" → valide la commande puis redirige vers `/paiement`
 
 #### Paiement simulé (`/paiement`)
 - Page dédiée (pas de popup)
 - Formulaire : numéro de carte (formaté auto en groupes de 4), nom du titulaire, expiration (MM/AA), CVV
-- Validation inline sur chaque champ
+- Validation inline sur chaque champ avec messages d'erreur
 - Récapitulatif des articles et du total à droite
-- Simulation en 3 étapes : formulaire → processing (spinner 2s) → succès (checkmark + barre de progression) → redirect `/commandes`
+- Simulation en 3 étapes : formulaire → processing (spinner 2.2s) → succès (checkmark + barre de progression) → redirect `/commandes`
 
 #### Commandes (`/commandes`)
 - Liste de toutes les commandes passées avec statut coloré
@@ -283,13 +274,12 @@ Ou créer un compte directement via `/register`.
 
 ### Espace Administrateur
 
-Accessible uniquement aux comptes avec `role = admin`. Toutes les routes `/admin/*` sont protégées côté frontend et backend.
+Accessible uniquement aux comptes avec `role = admin`. Toutes les routes `/admin/*` sont protégées côté frontend (`AdminRoute`) et backend (middleware `isAdmin`).
 
 #### Dashboard (`/admin/dashboard`)
 - **4 KPI cards** : chiffre d'affaires total, nombre de commandes, clients, produits
-- **Graphique revenus** (Chart.js) : courbe de surface sur les 12 derniers mois, tooltip personnalisé, dégradé vert
-- **Top 5 produits** les plus vendus avec médailles
-- Liens rapides vers toutes les sections
+- **Graphique revenus** (Chart.js `Line`) : courbe de surface sur les 12 derniers mois, tooltip personnalisé, dégradé vert, axe Y en `k`
+- **Top 5 produits** les plus vendus avec médailles (or / argent / bronze)
 
 #### Gestion des produits (`/admin/produits`)
 - Tableau avec image, catégorie, prix, badge stock
@@ -307,9 +297,11 @@ Accessible uniquement aux comptes avec `role = admin`. Toutes les routes `/admin
 - Suppression avec confirmation
 
 #### Gestion des clients (`/admin/clients`)
-- Tableau avec nom, email, téléphone, adresse
+- Tableau avec nom, email, téléphone, adresse et compteur total
 - Recherche par nom ou email
-- Suppression de compte
+- **Modifier** un client → modal d'édition avec les 4 champs pré-remplis (nom, email, téléphone, adresse), validation unicité email/téléphone
+- **Supprimer** un compte → modal de confirmation avec avertissement "action irréversible"
+- Toasts de retour pour chaque action
 
 #### Gestion des commandes (`/admin/commandes`)
 - Tableau de toutes les commandes avec client, date, total, statut
@@ -349,18 +341,17 @@ backend/
 ├── database/
 │   ├── factories/
 │   ├── migrations/
+│   │   └── ..._add_stock_triggers.php   # Triggers MySQL
 │   └── seeders/
 └── routes/
     └── api.php
 
 frontend/
 └── src/
-    ├── assets/
     ├── components/
     │   ├── Footer.jsx
     │   ├── Navbar.jsx
     │   ├── NotFound.jsx
-    │   ├── PaymentModal.jsx       # (conservé mais non utilisé)
     │   ├── ProtectedRoute.jsx
     │   └── TransitionRegister.jsx
     ├── context/
@@ -393,8 +384,8 @@ frontend/
     │       ├── AdminProduits.jsx
     │       └── Dashboard.jsx
     ├── services/
-    │   ├── authService.js         # login, register, logout, getMe, updateProfile
-    │   └── productService.js      # produits, commandes, wishlist, admin
+    │   ├── authService.js
+    │   └── productService.js
     ├── App.jsx
     ├── i18n.js
     └── main.jsx
@@ -410,9 +401,19 @@ frontend/
 |---------|----------|-------------|
 | `POST` | `/api/register` | Créer un compte |
 | `POST` | `/api/login` | Se connecter, retourne un token |
-| `GET` | `/api/produits` | Lister les produits (params: `nom_produit`, `prix`, `categorie`, `page`) |
+| `GET` | `/api/produits` | Lister les produits (params: `nom_produit`, `prix`, `categorie`, `disponibilite`, `page`) |
 | `GET` | `/api/produits/{id}` | Détail d'un produit |
 | `GET` | `/api/categories` | Lister toutes les catégories |
+
+**Paramètres de filtrage pour `GET /api/produits` :**
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `nom_produit` | string | Recherche partielle sur le nom |
+| `prix` | number | Prix maximum |
+| `categorie` | integer | ID de la catégorie |
+| `disponibilite` | string | `en_stock` pour filtrer les produits avec stock > 0 |
+| `page` | integer | Numéro de page (pagination 12 par page) |
 
 ### Authentifiées — `Authorization: Bearer {token}`
 
@@ -424,6 +425,7 @@ frontend/
 | `GET` | `/api/commandes` | Mes commandes (avec lignes et produits) |
 | `POST` | `/api/commandes` | Créer une commande (panier) |
 | `GET` | `/api/commandes/{id}` | Détail d'une commande |
+| `POST` | `/api/commandes/{id}/valider` | Valider la commande — retourne 422 si vide |
 | `POST` | `/api/commandes/{id}/lignes` | Ajouter un article au panier |
 | `PUT` | `/api/commandes/{id}/lignes/{ligne}` | Modifier la quantité d'un article |
 | `DELETE` | `/api/commandes/{id}/lignes/{ligne}` | Supprimer un article du panier |
@@ -444,6 +446,8 @@ frontend/
 | `PUT` | `/api/admin/categories/{id}` | Modifier une catégorie |
 | `DELETE` | `/api/admin/categories/{id}` | Supprimer une catégorie |
 | `GET` | `/api/admin/clients` | Lister les clients |
+| `GET` | `/api/admin/clients/{id}` | Détail d'un client |
+| `PUT` | `/api/admin/clients/{id}` | Modifier nom, email, téléphone, adresse d'un client |
 | `DELETE` | `/api/admin/clients/{id}` | Supprimer un client |
 | `GET` | `/api/admin/commandes` | Toutes les commandes |
 | `PUT` | `/api/admin/commandes/{id}` | Changer le statut d'une commande |
@@ -468,21 +472,21 @@ categories
 produits
 ├── id, nom_prduit, description_prduit
 ├── prix (decimal 8,2), stock_produit (int)
-├── image (nullable), categorie_id (FK)
+├── image (nullable), categorie_id (FK → categories)
 └── timestamps
 
 commandes
-├── id, user_id (FK), date_commande
+├── id, user_id (FK → users), date_commande
 ├── total (decimal 10,2), statut (en_attente|expediee|livree)
 └── timestamps
 
 ligne_commandes
-├── id, commandes_id (FK), produit_id (FK)
+├── id, commandes_id (FK → commandes), produit_id (FK → produits)
 ├── quantite (int), sous_total (decimal 10,2)
 └── timestamps
 
 wishlists
-├── id, user_id (FK), produit_id (FK)
+├── id, user_id (FK → users), produit_id (FK → produits)
 ├── UNIQUE(user_id, produit_id)
 └── timestamps
 ```
@@ -497,6 +501,22 @@ wishlists
 | `Produit` | `belongsTo` Categorie, `hasMany` LigneCommande, `hasMany` Wishlist |
 | `Categorie` | `hasMany` Produit |
 | `Wishlist` | `belongsTo` User, `belongsTo` Produit |
+
+---
+
+## Triggers MySQL
+
+La gestion du stock est assurée **en base de données** via 5 triggers MySQL créés par la migration `add_stock_triggers`. Cela garantit l'intégrité des données même en cas d'accès direct à la base.
+
+| Trigger | Événement | Action |
+|---------|-----------|--------|
+| `trg_check_stock_before_insert` | `BEFORE INSERT` sur `ligne_commandes` | Bloque l'insertion si `stock_produit < quantite` (SIGNAL SQLSTATE 45000) |
+| `trg_decrement_stock_after_insert` | `AFTER INSERT` sur `ligne_commandes` | Décrémente `stock_produit` du produit concerné |
+| `trg_increment_stock_after_delete` | `AFTER DELETE` sur `ligne_commandes` | Réincrémente `stock_produit` lors de la suppression d'une ligne |
+| `trg_check_stock_before_update` | `BEFORE UPDATE` sur `ligne_commandes` | Vérifie que `stock_actuel + ancienne_quantite >= nouvelle_quantite` |
+| `trg_adjust_stock_after_update` | `AFTER UPDATE` sur `ligne_commandes` | Ajuste le stock : `stock + old.quantite - new.quantite` |
+
+Le `LigneCommandeController` conserve une vérification applicative en double sécurité, mais ne fait plus de `increment/decrement` manuels — c'est la base de données qui gère.
 
 ---
 
@@ -521,11 +541,11 @@ wishlists
 
 **`authService.js`**
 ```js
-login(data)          // POST /api/login
-register(data)       // POST /api/register
-logout()             // POST /api/logout (avec token)
-getMe()              // GET  /api/me
-updateProfile(data)  // PUT  /api/profile
+login(data)           // POST /api/login
+register(data)        // POST /api/register
+logout()              // POST /api/logout (avec token)
+getMe()               // GET  /api/me
+updateProfile(data)   // PUT  /api/profile
 ```
 
 **`productService.js`**
@@ -534,12 +554,13 @@ updateProfile(data)  // PUT  /api/profile
 getProduits()
 getProduitById(id)
 getCategories()
-getProduitsFilter(nom, prix, categorie, page)
+getProduitsFilter(nom, prix, categorie, page, disponibilite)
 
 // Panier / Commandes
 creerCommande()
 getCommandes()
 getCommandeById(id)
+validerCommande(id)                              // POST /commandes/{id}/valider
 ajouterLigne(commandeId, produitId, quantite)
 modifierLigne(commandeId, ligneId, quantite)
 supprimerLigne(commandeId, ligneId)
@@ -563,6 +584,7 @@ adminDeleteCategorie(id)
 
 // Admin — Clients
 adminGetClients()
+adminUpdateClient(id, data)    // PUT /admin/clients/{id}
 adminDeleteClient(id)
 
 // Admin — Commandes
@@ -579,7 +601,9 @@ adminGetStats()
 
 - Le **token** est stocké dans `localStorage` sous la clé `token`
 - Le **panier** est une commande avec `statut = en_attente` — une seule par utilisateur à la fois
-- La **gestion du stock** est automatique : décrémenté à l'ajout au panier, réincrémenté à la suppression
+- La **gestion du stock** est double : vérification applicative dans Laravel + triggers MySQL en base de données
+- Une **commande vide** ne peut pas être validée — l'API retourne 422 avec un message explicite
 - Les **images produits** sont des URLs externes (pas d'upload de fichier)
-- Le **paiement** est une simulation — aucune donnée bancaire n'est transmise
+- Le **paiement** est une simulation — aucune donnée bancaire n'est transmise ni stockée
 - L'application supporte **FR / EN** via i18next (sélecteur dans la navbar)
+- Les **triggers MySQL** nécessitent MySQL 8.0+ — SQLite n'est pas compatible

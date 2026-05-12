@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/commandes',[CommandeController::class, 'index']);
     Route::post('/commandes',[CommandeController::class, 'store']);
     Route::get('/commandes/{id}',[CommandeController::class, 'show']);
+    Route::post('/commandes/{id}/valider', [CommandeController::class, 'valider']);
     Route::post('/commandes/{id}/lignes', [LigneCommandeController::class, 'store']);
     Route::put('/commandes/{id}/lignes/{ligne}', [LigneCommandeController::class, 'update']);
     Route::delete('/commandes/{id}/lignes/{ligne}', [LigneCommandeController::class, 'destroy']);
@@ -58,6 +59,8 @@ Route::middleware(['auth:sanctum', 'isAdmin'])->prefix('admin')->group(function 
     Route::apiResource('/categories', AdminCategorieController::class);
 
     Route::get('/clients', [AdminClientController::class, 'index']);
+    Route::get('/clients/{id}', [AdminClientController::class, 'show']);
+    Route::put('/clients/{id}', [AdminClientController::class, 'update']);
     Route::delete('/clients/{id}', [AdminClientController::class, 'destroy']);
 
     Route::get('/commandes', [AdminCommandeController::class, 'index']);

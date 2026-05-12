@@ -35,10 +35,10 @@ class CommandeController extends Controller
         ]);
 
         $commande = Commande::create([
-            'user_id'        => $request->user()->id,
-            'date_commande'  => now(),
-            'total'          => $request->total,
-            'statut'         => $request->statut,
+            'user_id'       => $request->user()->id,
+            'date_commande' => now(),
+            'total'         => $request->total,
+            'statut'        => $request->statut,
         ]);
 
         return response()->json([
@@ -65,6 +65,48 @@ class CommandeController extends Controller
         return response()->json([
             'success' => true,
             'data'    => $commande,
+        ], 200);
+    }
+
+    /**
+     * Valider une commande (passer de en_attente à expediee).
+     * Règle métier : la commande doit contenir au moins un produit.
+     */
+    public function valider(Request $request, $id)
+    {
+        $commande = Commande::with('ligne_commande')
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$commande) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Commande introuvable',
+            ], 404);
+        }
+
+        if ($commande->statut !== 'en_attente') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette commande ne peut plus être modifiée',
+            ], 422);
+        }
+
+        // ── Validation : au moins un produit ──────────────────────────────
+        if ($commande->ligne_commande->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Impossible de valider une commande vide. Ajoutez au moins un produit.',
+            ], 422);
+        }
+
+        $commande->update(['statut' => 'expediee']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Commande validée avec succès',
+            'data'    => $commande->fresh(['ligne_commande.produit']),
         ], 200);
     }
 }

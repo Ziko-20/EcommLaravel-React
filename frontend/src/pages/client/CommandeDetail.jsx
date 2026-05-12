@@ -27,16 +27,18 @@ const CommandeDetail = () => {
   }, [id]);
 
   if (loading) return (
-    <div className="min-h-screen bg-[#f8f9ff]">
+    <div className="min-h-screen bg-[#f8f9ff] flex flex-col">
       <Navbar />
-      <div className="flex justify-center items-center h-64 text-gray-400">Chargement...</div>
+      <div className="flex-1 flex justify-center items-center text-gray-400">Chargement...</div>
+      <Footer />
     </div>
   );
 
   if (!commande) return (
-    <div className="min-h-screen bg-[#f8f9ff]">
+    <div className="min-h-screen bg-[#f8f9ff] flex flex-col">
       <Navbar />
-      <div className="flex justify-center items-center h-64 text-gray-400">Commande introuvable</div>
+      <div className="flex-1 flex justify-center items-center text-gray-400">Commande introuvable</div>
+      <Footer />
     </div>
   );
 

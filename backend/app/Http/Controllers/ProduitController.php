@@ -33,6 +33,11 @@ class ProduitController extends Controller
             $query->where('categorie_id', '=', $request->categorie);    
         }
 
+        /* Filtre disponibilité : en_stock = uniquement les produits avec stock > 0 */
+        if($request->filled('disponibilite') && $request->disponibilite === 'en_stock'){
+            $query->where('stock_produit', '>', 0);
+        }
+
         $produits=$query->paginate(12);
         return response()->json([
             "success"=>true,

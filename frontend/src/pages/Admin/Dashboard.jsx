@@ -52,29 +52,25 @@ const Dashboard = () => {
       label: "Chiffre d'affaires",
       value: `${Number(stats?.chiffre_affaires ?? 0).toLocaleString('fr-MA')} DH`,
       icon:  TrendingUp,
-      color: 'bg-green-50 text-green-600',
-      ring:  'ring-green-100',
+      color: 'text-green-500',
     },
     {
       label: 'Commandes',
       value: stats?.total_commandes ?? 0,
       icon:  ShoppingBag,
-      color: 'bg-blue-50 text-blue-600',
-      ring:  'ring-blue-100',
+      color: 'text-blue-500',
     },
     {
       label: 'Clients',
       value: stats?.total_clients ?? 0,
       icon:  Users,
-      color: 'bg-purple-50 text-purple-600',
-      ring:  'ring-purple-100',
+      color: 'text-purple-500',
     },
     {
       label: 'Produits',
       value: stats?.total_produits ?? 0,
       icon:  Package,
-      color: 'bg-amber-50 text-amber-600',
-      ring:  'ring-amber-100',
+      color: 'text-amber-500',
     },
   ];
 
@@ -156,14 +152,12 @@ const Dashboard = () => {
 
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {kpis.map(({ label, value, icon: Icon, color, ring }) => (
+        {kpis.map(({ label, value, icon: Icon, color }) => (
           <div
             key={label}
-            className={`bg-white rounded-2xl p-5 shadow-sm ring-1 ${ring} flex items-center gap-4`}
+            className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4"
           >
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
-              <Icon size={20} />
-            </div>
+            <Icon size={28} className={`flex-shrink-0 ${color}`} />
             <div className="min-w-0">
               <p className="text-xs text-gray-400 truncate">{label}</p>
               <p className="text-xl font-bold text-gray-800 truncate">{value}</p>
@@ -214,12 +208,7 @@ const Dashboard = () => {
           <div className="flex flex-col gap-3">
             {stats.top_produits.map((item, i) => (
               <div key={item.produit_id} className="flex items-center gap-3">
-                <span className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 ${
-                  i === 0 ? 'bg-amber-100 text-amber-600' :
-                  i === 1 ? 'bg-gray-100 text-gray-500'  :
-                  i === 2 ? 'bg-orange-100 text-orange-500' :
-                            'bg-gray-50 text-gray-400'
-                }`}>
+                <span className="text-xs font-bold w-5 text-center flex-shrink-0 text-gray-400">
                   {i + 1}
                 </span>
                 <span className="flex-1 text-sm text-gray-700 truncate">

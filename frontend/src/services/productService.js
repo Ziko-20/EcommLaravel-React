@@ -28,13 +28,14 @@ export const getCategories=async()=>{
 };
 /* filtration et recherche */
 
-export const getProduitsFilter = async (nom, prix, categorie,page = 1) => {
+export const getProduitsFilter = async (nom, prix, categorie, page = 1, disponibilite = '') => {
   const response = await axios.get('http://localhost:8000/api/produits', {
     params: {
-      nom_produit: nom,
-      prix: prix,
-      categorie: categorie,
-      page:page
+      nom_produit:  nom,
+      prix:         prix,
+      categorie:    categorie,
+      page:         page,
+      disponibilite: disponibilite || undefined,
     }
   });
   return response;
@@ -124,6 +125,11 @@ export const adminGetClients = async () => {
   return response;
 };
 
+export const adminUpdateClient = async (id, data) => {
+  const response = await axios.put(`${API_URL}/admin/clients/${id}`, data, { headers: headers() });
+  return response;
+};
+
 export const adminDeleteClient = async (id) => {
   const response = await axios.delete(`${API_URL}/admin/clients/${id}`, { headers: headers() });
   return response;
@@ -165,6 +171,11 @@ export const supprimerWishlist = async (id) => {
 // ─── Commandes client ─────────────────────────────────────────────────────────
 export const getCommandeById = async (id) => {
   const response = await axios.get(`${API_URL}/commandes/${id}`, { headers: headers() });
+  return response;
+};
+
+export const validerCommande = async (id) => {
+  const response = await axios.post(`${API_URL}/commandes/${id}/valider`, {}, { headers: headers() });
   return response;
 };
 

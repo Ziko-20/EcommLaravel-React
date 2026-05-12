@@ -47,6 +47,7 @@ const Wishlist = () => {
     <div className="min-h-screen bg-[#f8f9ff] flex flex-col">
       <Navbar />
       <div className="flex-1 flex justify-center items-center text-gray-400">Chargement...</div>
+      <Footer />
     </div>
   );
 

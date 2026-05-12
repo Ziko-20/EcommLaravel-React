@@ -111,9 +111,22 @@ const Paiement = () => {
 
             {/* Numéro de carte */}
             <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-4">
-              <h2 className="font-semibold text-gray-700 flex items-center gap-2">
-                <CreditCard size={16} className="text-green-500" /> Informations de carte
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold text-gray-700 flex items-center gap-2">
+                  <CreditCard size={16} className="text-green-500" /> Informations de carte
+                </h2>
+                {/* Mini badges dans le formulaire */}
+                <div className="flex items-center gap-2">
+                  <svg viewBox="0 0 48 16" className="h-4 w-auto" xmlns="http://www.w3.org/2000/svg">
+                    <text x="0" y="13" fontFamily="Arial, sans-serif" fontWeight="900" fontSize="16" fill="#1A1F71" letterSpacing="-0.5">VISA</text>
+                  </svg>
+                  <svg viewBox="0 0 38 24" className="h-5 w-auto" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="14" cy="12" r="10" fill="#EB001B" />
+                    <circle cx="24" cy="12" r="10" fill="#F79E1B" />
+                    <path d="M19 5.27a10 10 0 0 1 0 13.46A10 10 0 0 1 19 5.27z" fill="#FF5F00" />
+                  </svg>
+                </div>
+              </div>
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Numéro de carte</label>
@@ -180,7 +193,7 @@ const Paiement = () => {
             <div className="flex items-center gap-3 bg-green-50 border border-green-100 rounded-2xl px-5 py-3">
               <ShieldCheck size={18} className="text-green-500 flex-shrink-0" />
               <p className="text-xs text-green-700">
-                Paiement 100% sécurisé — Simulation uniquement, aucune donnée réelle n'est transmise.
+                Paiement 100% sécurisé
               </p>
             </div>
 
@@ -234,12 +247,34 @@ const Paiement = () => {
             </div>
 
             {/* Logos cartes */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-center gap-3">
-              {['VISA', 'MC', 'AMEX', 'CMI'].map((c) => (
-                <span key={c} className="text-xs font-bold text-gray-400 border border-gray-200 rounded-lg px-2 py-1">
-                  {c}
-                </span>
-              ))}
+            <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-center gap-4">
+
+              {/* Visa */}
+              <svg viewBox="0 0 48 16" className="h-6 w-auto" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="13" fontFamily="Arial, sans-serif" fontWeight="900" fontSize="16" fill="#1A1F71" letterSpacing="-0.5">VISA</text>
+              </svg>
+
+              <div className="w-px h-6 bg-gray-100" />
+
+              {/* Mastercard */}
+              <svg viewBox="0 0 38 24" className="h-7 w-auto" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="14" cy="12" r="10" fill="#EB001B" />
+                <circle cx="24" cy="12" r="10" fill="#F79E1B" />
+                <path d="M19 5.27a10 10 0 0 1 0 13.46A10 10 0 0 1 19 5.27z" fill="#FF5F00" />
+              </svg>
+
+              <div className="w-px h-6 bg-gray-100" />
+
+              {/* CMI */}
+              <span className="text-xs font-extrabold tracking-wider text-[#005baa]">CMI</span>
+
+              <div className="w-px h-6 bg-gray-100" />
+
+              {/* Amex */}
+              <svg viewBox="0 0 50 16" className="h-5 w-auto" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="13" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="13" fill="#007BC1" letterSpacing="0.5">AMEX</text>
+              </svg>
+
             </div>
           </div>
         </div>
