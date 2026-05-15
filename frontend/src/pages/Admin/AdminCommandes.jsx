@@ -3,6 +3,9 @@ import { ShoppingBag, ChevronDown, Clock, Truck, CheckCircle } from 'lucide-reac
 import AdminLayout from './AdminLayout';
 import { adminGetCommandes, adminUpdateStatutCommande } from '../../services/productService';
 import { useToast } from '../../context/ToastContext';
+import Pagination from '../../components/Pagination';
+
+const PER_PAGE = 7;
 
 const statutConfig = {
   en_attente: { label: 'En attente',  color: 'bg-amber-50 text-amber-600',  icon: Clock       },
@@ -14,6 +17,7 @@ const AdminCommandes = () => {
   const [commandes, setCommandes] = useState([]);
   const [loading, setLoading]     = useState(true);
   const [filter, setFilter]       = useState('');
+  const [page, setPage]           = useState(1);
   const { toast }                 = useToast();
 
   const charger = () => {
@@ -40,6 +44,12 @@ const AdminCommandes = () => {
     ? commandes.filter((c) => c.statut === filter)
     : commandes;
 
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  // Remet à la page 1 quand le filtre change
+  const handleFilter = (val) => { setFilter(val); setPage(1); };
+
   return (
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
@@ -48,7 +58,7 @@ const AdminCommandes = () => {
         </h1>
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => handleFilter(e.target.value)}
           className="border border-gray-200 rounded-xl px-4 py-2 text-sm bg-white outline-none focus:border-green-500"
         >
           <option value="">Tous les statuts</option>
@@ -79,7 +89,7 @@ const AdminCommandes = () => {
                   <td colSpan={6} className="text-center py-10 text-gray-400">Aucune commande</td>
                 </tr>
               ) : (
-                filtered.map((commande) => {
+                paginated.map((commande) => {
                   const cfg  = statutConfig[commande.statut] || statutConfig.en_attente;
                   const Icon = cfg.icon;
                   return (
@@ -118,6 +128,13 @@ const AdminCommandes = () => {
               )}
             </tbody>
           </table>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPage={setPage}
+            total={filtered.length}
+            perPage={PER_PAGE}
+          />
         </div>
       )}
     </AdminLayout>

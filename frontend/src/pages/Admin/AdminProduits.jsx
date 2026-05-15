@@ -4,11 +4,15 @@ import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { adminGetProduits, adminDeleteProduit } from '../../services/productService';
 import { useToast } from '../../context/ToastContext';
+import Pagination from '../../components/Pagination';
+
+const PER_PAGE = 7;
 
 const AdminProduits = () => {
   const [produits, setProduits] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState('');
+  const [page, setPage]         = useState(1);
   const { toast }               = useToast();
 
   const charger = () => {
@@ -35,6 +39,11 @@ const AdminProduits = () => {
     p.nom_prduit?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  const handleSearch = (val) => { setSearch(val); setPage(1); };
+
   return (
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
@@ -56,7 +65,7 @@ const AdminProduits = () => {
           type="text"
           placeholder="Rechercher un produit..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           className="w-full border border-gray-200 bg-white pl-10 pr-4 h-11 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-100 text-sm"
         />
       </div>
@@ -81,7 +90,7 @@ const AdminProduits = () => {
                   <td colSpan={5} className="text-center py-10 text-gray-400">Aucun produit trouvé</td>
                 </tr>
               ) : (
-                filtered.map((p) => (
+                paginated.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -127,6 +136,13 @@ const AdminProduits = () => {
               )}
             </tbody>
           </table>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPage={setPage}
+            total={filtered.length}
+            perPage={PER_PAGE}
+          />
         </div>
       )}
     </AdminLayout>

@@ -8,6 +8,9 @@ import {
   adminUpdateCategorie,
   adminDeleteCategorie,
 } from '../../services/productService';
+import Pagination from '../../components/Pagination';
+
+const PER_PAGE = 7;
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -16,6 +19,7 @@ const AdminCategories = () => {
   const [editId, setEditId]         = useState(null);
   const [editNom, setEditNom]       = useState('');
   const [error, setError]           = useState('');
+  const [page, setPage]             = useState(1);
   const { toast }                   = useToast();
 
   const charger = () => {
@@ -34,6 +38,7 @@ const AdminCategories = () => {
       await adminCreateCategorie({ categorie: newNom.trim() });
       setNewNom('');
       charger();
+      setPage(1); // retour page 1 après ajout
       toast('Catégorie créée', 'success');
     } catch (err) {
       toast(err.response?.data?.message || 'Erreur', 'error');
@@ -113,7 +118,9 @@ const AdminCategories = () => {
                   <td colSpan={3} className="text-center py-10 text-gray-400">Aucune catégorie</td>
                 </tr>
               ) : (
-                categories.map((c) => (
+                categories
+                  .slice((page - 1) * PER_PAGE, page * PER_PAGE)
+                  .map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 text-gray-400">{c.id}</td>
                     <td className="px-6 py-4">
@@ -169,6 +176,13 @@ const AdminCategories = () => {
               )}
             </tbody>
           </table>
+          <Pagination
+            page={page}
+            totalPages={Math.ceil(categories.length / PER_PAGE)}
+            onPage={setPage}
+            total={categories.length}
+            perPage={PER_PAGE}
+          />
         </div>
       )}
     </AdminLayout>

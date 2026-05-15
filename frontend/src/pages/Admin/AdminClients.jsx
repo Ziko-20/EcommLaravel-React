@@ -6,6 +6,9 @@ import {
 import AdminLayout from './AdminLayout';
 import { adminGetClients, adminUpdateClient, adminDeleteClient } from '../../services/productService';
 import { useToast } from '../../context/ToastContext';
+import Pagination from '../../components/Pagination';
+
+const PER_PAGE = 7;
 
 /* ── Modal d'édition ── */
 const EditModal = ({ client, onClose, onSave }) => {
@@ -141,6 +144,7 @@ const AdminClients = () => {
   const [clients, setClients]     = useState([]);
   const [loading, setLoading]     = useState(true);
   const [search, setSearch]       = useState('');
+  const [page, setPage]           = useState(1);
   const [editClient, setEditClient]     = useState(null);
   const [deleteClient, setDeleteClient] = useState(null);
   const { toast } = useToast();
@@ -175,6 +179,11 @@ const AdminClients = () => {
     c.email?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  const handleSearch = (val) => { setSearch(val); setPage(1); };
+
   return (
     <AdminLayout>
       <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
@@ -191,7 +200,7 @@ const AdminClients = () => {
           type="text"
           placeholder="Rechercher par nom ou email..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           className="w-full border border-gray-200 bg-white pl-10 pr-4 h-11 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-100 text-sm"
         />
       </div>
@@ -215,7 +224,7 @@ const AdminClients = () => {
                   <td colSpan={4} className="text-center py-10 text-gray-400">Aucun client trouvé</td>
                 </tr>
               ) : (
-                filtered.map((c) => (
+                paginated.map((c) => (
                   <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -268,6 +277,13 @@ const AdminClients = () => {
               )}
             </tbody>
           </table>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPage={setPage}
+            total={filtered.length}
+            perPage={PER_PAGE}
+          />
         </div>
       )}
 
